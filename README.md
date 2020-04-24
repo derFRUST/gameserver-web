@@ -8,6 +8,10 @@ As for now, we are just checking out different technologies:
 - Rocket for the API backend server
 
 ## Use cases
+### Visitors
+- log in
+
+### Users
 - check server status
 - start server
     - create new game
@@ -21,3 +25,9 @@ As for now, we are just checking out different technologies:
     - admin list
 - upload and download save games
 - delete server
+- manage account settings
+- log out
+
+### Administrators
+- manage games
+- manage users and permissions
