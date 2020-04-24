@@ -36,7 +36,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 const statusClassMap = Object.freeze({
   stopped: "text-danger",
   starting: "text-warning",
@@ -44,15 +46,9 @@ const statusClassMap = Object.freeze({
   stopping: "text-warning"
 });
 
-export default {
-  name: "ServerCard",
-  props: {
-    server: Object
-  },
-  data() {
-    return {
-      statusClassMap
-    };
-  }
-};
+@Component
+export default class ServerCard extends Vue {
+  @Prop({ required: true }) readonly server: Record<string, string>;
+  private statusClassMap = statusClassMap;
+}
 </script>

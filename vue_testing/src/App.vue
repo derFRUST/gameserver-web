@@ -1,17 +1,18 @@
 <template>
   <div id="app">
-    <TheNavbar/>
-    <router-view/>
+    <TheNavbar />
+    <router-view />
   </div>
 </template>
 
-<script>
-import TheNavbar from '@/components/TheNavbar.vue'
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import TheNavbar from "@/components/TheNavbar.vue";
 
-export default {
-  name: 'App',
+@Component({
   components: {
     TheNavbar
   }
-}
+})
+export default class App extends Vue {}
 </script>

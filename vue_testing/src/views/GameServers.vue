@@ -25,7 +25,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 import ServerCard from "@/components/ServerCard.vue";
 
 const games = {
@@ -39,26 +40,23 @@ const games = {
   }
 };
 
-export default {
-  name: "GameServers",
+@Component({
   components: {
     ServerCard
-  },
-  data() {
-    return {
-      servers: [
-        {
-          name: "factorio-01",
-          game: games.factorio,
-          status: "stopped"
-        },
-        {
-          name: "satisfactory-01",
-          game: games.satisfactory,
-          status: "started"
-        }
-      ]
-    };
   }
-};
+})
+export default class GameServers extends Vue {
+  private servers: Array<object> = [
+    {
+      name: "factorio-01",
+      game: games.factorio,
+      status: "stopped"
+    },
+    {
+      name: "satisfactory-01",
+      game: games.satisfactory,
+      status: "started"
+    }
+  ];
+}
 </script>
