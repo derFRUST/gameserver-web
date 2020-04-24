@@ -59,7 +59,7 @@ const statusClassMap = Object.freeze({
 
 @Component
 export default class ServerCard extends Vue {
-  @Prop({ required: true }) readonly server: Record<string, string>;
+  @Prop({ required: true }) readonly server!: Record<string, string>;
   @Emit()
   private startServer(): Record<string, string> {
     return this.server;

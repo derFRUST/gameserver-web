@@ -64,7 +64,7 @@ export default class GameServers extends Vue {
       status: "started"
     }
   ];
-  private startServer(server): void {
+  private startServer(server: Record<string, string>): void {
     // TODO: Replace by API communication
     console.log("Start server: " + server.name);
     server.status = "starting";
@@ -72,7 +72,7 @@ export default class GameServers extends Vue {
       server.status = "started";
     }, 3000);
   }
-  private stopServer(server): void {
+  private stopServer(server: Record<string, string>): void {
     // TODO: Replaced by API communication
     console.log("Stop server: " + server.name);
     server.status = "stopping";
