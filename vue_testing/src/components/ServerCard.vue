@@ -7,17 +7,28 @@
         <p>
           {{server.game.name}}
           <br />Status:
-          <span :class="statusClassMap[server.status]">{{server.status}}</span>
+          <span :class="statusClassMap[server.status]">
+            {{server.status}}
+            <span
+              v-if="server.status == 'stopping' || server.status == 'starting'"
+              class="spinner-border spinner-border-sm"
+            ></span>
+          </span>
         </p>
         <div class="mt-auto">
           <div class="btn-group mr-1">
             <button
-              v-if="server.status == 'stopped'"
+              v-if="server.status == 'starting' || server.status == 'stopped'"
+              :disabled="server.status == 'starting'"
+              @click="startServer"
               type="button"
               class="btn btn-sm btn-success"
+              role="status"
             >Start</button>
             <button
-              v-if="server.status == 'started'"
+              v-if="server.status == 'stopping' || server.status == 'started'"
+              :disabled="server.status == 'stopping'"
+              @click="stopServer"
               type="button"
               class="btn btn-sm btn-danger"
             >Stop</button>
@@ -37,18 +48,26 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Emit } from "vue-property-decorator";
 
 const statusClassMap = Object.freeze({
   stopped: "text-danger",
-  starting: "text-warning",
+  starting: "text-success",
   started: "text-success",
-  stopping: "text-warning"
+  stopping: "text-danger"
 });
 
 @Component
 export default class ServerCard extends Vue {
   @Prop({ required: true }) readonly server: Record<string, string>;
+  @Emit()
+  private startServer(): Record<string, string> {
+    return this.server;
+  }
+  @Emit()
+  private stopServer(): Record<string, string> {
+    return this.server;
+  }
   private statusClassMap = statusClassMap;
 }
 </script>

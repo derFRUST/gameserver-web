@@ -6,7 +6,13 @@
     </div>
 
     <div class="row">
-      <ServerCard :key="server.name" :server="server" v-for="server in servers" />
+      <ServerCard
+        @start-server="startServer"
+        @stop-server="stopServer"
+        :key="server.name"
+        :server="server"
+        v-for="server in servers"
+      />
 
       <div class="col-lg-4 col-md-6 mt-4 d-flex">
         <div class="card shadow-sm">
@@ -58,5 +64,21 @@ export default class GameServers extends Vue {
       status: "started"
     }
   ];
+  private startServer(server): void {
+    // TODO: Replace by API communication
+    console.log("Start server: " + server.name);
+    server.status = "starting";
+    setTimeout(() => {
+      server.status = "started";
+    }, 3000);
+  }
+  private stopServer(server): void {
+    // TODO: Replaced by API communication
+    console.log("Stop server: " + server.name);
+    server.status = "stopping";
+    setTimeout(() => {
+      server.status = "stopped";
+    }, 3000);
+  }
 }
 </script>
