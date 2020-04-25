@@ -15,4 +15,3 @@ juniper_rocket = "0.5.2"
 
 [dependencies.juniper]
 version = "0.14.2"
-features = ["expose-test-schema", "serde_json"]

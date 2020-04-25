@@ -211,7 +211,6 @@ dependencies = [
  "juniper_codegen",
  "serde",
  "serde_derive",
- "serde_json",
  "url 2.1.1",
  "uuid",
 ]
