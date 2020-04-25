@@ -4,7 +4,7 @@ use rocket::{response::content, State};
 
 use juniper::{EmptyMutation, RootNode};
 
-use rocket_testing::{context::Database, schema::Query};
+use rocket_testing::{model::Database, schema::Query};
 
 type Schema = RootNode<'static, Query, EmptyMutation<Database>>;
 
