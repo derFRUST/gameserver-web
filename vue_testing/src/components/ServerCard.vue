@@ -1,16 +1,16 @@
 <template>
   <div class="col-lg-4 col-md-6 mt-4 d-flex">
     <div class="card shadow-sm">
-      <img :src="server.game.image" class="card-img-top" :alt="server.game.name" />
+      <img :src="image" class="card-img-top" :alt="server.game.name" />
       <div class="card-body d-flex flex-column">
         <h2>{{server.name}}</h2>
         <p>
           {{server.game.name}}
           <br />Status:
           <span :class="statusClassMap[server.status]">
-            {{server.status}}
+            {{server.status.toLowerCase()}}
             <span
-              v-if="server.status == 'stopping' || server.status == 'starting'"
+              v-if="server.status == 'STOPPING' || server.status == 'STARTING'"
               class="spinner-border spinner-border-sm"
             ></span>
           </span>
@@ -18,16 +18,16 @@
         <div class="mt-auto">
           <div class="btn-group mr-1">
             <button
-              v-if="server.status == 'starting' || server.status == 'stopped'"
-              :disabled="server.status == 'starting'"
+              v-if="server.status == 'STARTING' || server.status == 'STOPPED'"
+              :disabled="server.status == 'STARTING'"
               @click="startServer"
               type="button"
               class="btn btn-sm btn-success"
               role="status"
             >Start</button>
             <button
-              v-if="server.status == 'stopping' || server.status == 'started'"
-              :disabled="server.status == 'stopping'"
+              v-if="server.status == 'STOPPING' || server.status == 'STARTED'"
+              :disabled="server.status == 'STOPPING'"
               @click="stopServer"
               type="button"
               class="btn btn-sm btn-danger"
@@ -51,15 +51,16 @@
 import { Component, Prop, Vue, Emit } from "vue-property-decorator";
 
 const statusClassMap = Object.freeze({
-  stopped: "text-danger",
-  starting: "text-success",
-  started: "text-success",
-  stopping: "text-danger"
+  STOPPED: "text-danger",
+  STARTING: "text-success",
+  STARTED: "text-success",
+  STOPPING: "text-danger"
 });
 
 @Component
 export default class ServerCard extends Vue {
   @Prop({ required: true }) readonly server!: Record<string, string>;
+  @Prop({ required: true }) readonly image!: string;
   @Emit()
   private startServer(): Record<string, string> {
     return this.server;
