@@ -59,6 +59,7 @@ impl Server for ServerData {
     }
 }
 
+#[derive(Default)]
 pub struct Database {
     games: Vec<GameData>,
     servers: Vec<ServerData>,
@@ -108,6 +109,30 @@ impl Database {
 
     pub fn get_servers(&self) -> Vec<&dyn Server> {
         self.servers.iter().map(|x| x as &dyn Server).collect()
+    }
+
+    pub fn start_stop_server(&self, name: &str) -> Option<&dyn Server> {
+        println!("start_stop_server({})", name);
+
+        let server_option = self
+            .servers
+            .iter()
+            .filter(|&x| x.name == name)
+            .map(|x| x as &dyn Server)
+            .next();
+        if let Some(server) = server_option {
+            println!(
+                "Current status: {}",
+                match server.status() {
+                    ServerStatus::Stopped => "STOPPED",
+                    ServerStatus::Starting => "STARTING",
+                    ServerStatus::Started => "STARTED",
+                    ServerStatus::Stopping => "STOPPING",
+                }
+            );
+            // TODO: Change server status
+        }
+        server_option
     }
 }
 

@@ -3,11 +3,7 @@
 use rocket::{http::Method, response::content, State};
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
-use juniper::{EmptyMutation, RootNode};
-
-use rocket_testing::{model::Database, schema::Query};
-
-type Schema = RootNode<'static, Query, EmptyMutation<Database>>;
+use rocket_testing::{model::Database, schema::create_schema, schema::Schema};
 
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
@@ -35,7 +31,7 @@ fn main() -> Result<(), Error> {
 
     rocket::ignite()
         .manage(Database::new())
-        .manage(Schema::new(Query, EmptyMutation::<Database>::new()))
+        .manage(create_schema())
         .mount("/", rocket::routes![graphiql, post_graphql_handler])
         .attach(cors)
         .launch();

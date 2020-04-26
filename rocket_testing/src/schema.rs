@@ -1,4 +1,5 @@
 use crate::model::*;
+use juniper::RootNode;
 
 #[juniper::object(
     Context = Database,
@@ -42,4 +43,21 @@ impl Query {
     fn servers(database: &Database) -> Vec<&dyn Server> {
         database.get_servers()
     }
+}
+
+pub struct Mutations;
+
+#[juniper::object(
+    Context = Database,
+)]
+impl Mutations {
+    fn start_stop_server(database: &Database, name: String) -> Option<&dyn Server> {
+        database.start_stop_server(&name)
+    }
+}
+
+pub type Schema = RootNode<'static, Query, Mutations>;
+
+pub fn create_schema() -> Schema {
+    Schema::new(Query {}, Mutations {})
 }
