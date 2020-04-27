@@ -1,73 +1,34 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">
+    <b-navbar toggleable="md" type="dark" variant="dark">
+      <b-container>
+        <b-navbar-brand href="#">
           gs.<b>FRUSTserver</b>.de
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbar"
-          aria-controls="navbar"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        </b-navbar-brand>
 
-        <div class="collapse navbar-collapse" id="navbar">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item dropdown">
-              <router-link
-                to="/game-servers"
-                class="nav-link dropdown-toggle"
-                id="dropdown_servers"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                exact
-                exact-active-class="active"
-              >Game servers</router-link>
-              <div class="dropdown-menu" aria-labelledby="dropdown_servers">
-                <a class="dropdown-item" href="#">factorio-01 (Factorio Experimental 0.18.18)</a>
-                <a class="dropdown-item" href="#">satisfactory-01 (Satisfactory Early Access)</a>
-                <a class="dropdown-item" href="#">Create new server</a>
-              </div>
-            </li>
+        <b-navbar-toggle target="navbar"></b-navbar-toggle>
 
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Status</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Settings</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Saves</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Users</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                id="dropdown_user"
-                href="#"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >TheAdmin</a>
-              <div class="dropdown-menu" aria-labelledby="dropdown_user">
-                <a class="dropdown-item" href="#">Account</a>
-                <a class="dropdown-item" href="#">Log out</a>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+        <b-collapse id="navbar" is-nav>
+          <b-navbar-nav>
+            <b-nav-item-dropdown text="Game servers">
+              <b-dropdown-item href="#">factorio-01 (Factorio Experimental 0.18.18)</b-dropdown-item>
+              <b-dropdown-item href="#">satisfactory-01 (Satisfactory Early Access)</b-dropdown-item>
+              <b-dropdown-item href="#">Create new server</b-dropdown-item>
+            </b-nav-item-dropdown>
+
+            <b-nav-item href="#" disabled>Status</b-nav-item>
+            <b-nav-item href="#" disabled>Settings</b-nav-item>
+            <b-nav-item href="#" disabled>Saves</b-nav-item>
+          </b-navbar-nav>
+          <b-navbar-nav class="ml-auto">
+            <b-nav-item href>Users</b-nav-item>
+            <b-nav-item-dropdown text="TheAdmin">
+              <b-dropdown-item href="#">Account</b-dropdown-item>
+              <b-dropdown-item href="#">Log out</b-dropdown-item>
+            </b-nav-item-dropdown>
+          </b-navbar-nav>
+        </b-collapse>
+      </b-container>
+    </b-navbar>
   </div>
 </template>

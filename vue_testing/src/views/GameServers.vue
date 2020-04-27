@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <b-container>
     <div class="text-center">
       <h1 class="display-4">Game servers</h1>
       <p class="lead">You can create new servers and manage your existing ones here.</p>
@@ -23,7 +23,7 @@
         <!-- Some content -->
         <div v-if="loading">Loading...</div>
         <div v-if="error">Error!</div>
-        <div class="row">
+        <b-row>
           <ServerCard
             @start-server="startServer"
             @stop-server="stopServer"
@@ -32,23 +32,25 @@
             :image="'https://steamcdn-a.akamaihd.net/steam/apps/' + server.game.image + '/header.jpg'"
             v-for="server in data ? data.servers : []"
           />
-          <div class="col-lg-4 col-md-6 mt-4 d-flex">
-            <div class="card shadow-sm">
-              <img src="../assets/servers_create.png" class="card-img-top" alt="Create" />
-              <div class="card-body d-flex flex-column">
-                <div class="card-text">
-                  <h2>Create new server</h2>
+          <b-col lg="4" md="6" class="mt-4 d-flex">
+            <b-card
+              :img-src="require('../assets/servers_create.png')"
+              img-alt="Create"
+              no-body
+              class="shadow"
+            >
+              <b-card-body class="d-flex flex-column">
+                <b-card-title>Create new server</b-card-title>
+                <div class="flex-column mt-auto">
+                  <b-button variant="primary" size="sm">Create</b-button>
                 </div>
-                <div class="mt-auto">
-                  <button type="button" class="btn btn-sm btn-primary">Create</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              </b-card-body>
+            </b-card>
+          </b-col>
+        </b-row>
       </template>
     </ApolloQuery>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">

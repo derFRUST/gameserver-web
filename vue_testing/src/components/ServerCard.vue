@@ -1,50 +1,45 @@
 <template>
-  <div class="col-lg-4 col-md-6 mt-4 d-flex">
-    <div class="card shadow-sm">
-      <img :src="image" class="card-img-top" :alt="server.game.name" />
-      <div class="card-body d-flex flex-column">
-        <h2>{{server.name}}</h2>
-        <p>
+  <b-col lg="4" md="6" class="mt-4 d-flex">
+    <b-card :img-src="image" :img-alt="server.game.name" no-body class="shadow">
+      <b-card-body class="d-flex flex-column">
+        <b-card-title>{{server.name}}</b-card-title>
+        <b-card-text>
           {{server.game.name}}
           <br />Status:
           <span :class="statusClassMap[server.status]">
             {{server.status.toLowerCase()}}
-            <span
-              v-if="server.status == 'STOPPING' || server.status == 'STARTING'"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <b-spinner small v-if="server.status == 'STOPPING' || server.status == 'STARTING'" />
           </span>
-        </p>
-        <div class="mt-auto">
-          <div class="btn-group mr-1">
-            <button
+        </b-card-text>
+        <div class="flex-column mt-auto">
+          <b-button-group class="mr-1">
+            <b-button
               v-if="server.status == 'STARTING' || server.status == 'STOPPED'"
               :disabled="server.status == 'STARTING'"
               @click="startServer"
-              type="button"
-              class="btn btn-sm btn-success"
-              role="status"
-            >Start</button>
-            <button
+              size="sm"
+              variant="success"
+            >Start</b-button>
+            <b-button
               v-if="server.status == 'STOPPING' || server.status == 'STARTED'"
               :disabled="server.status == 'STOPPING'"
               @click="stopServer"
-              type="button"
-              class="btn btn-sm btn-danger"
-            >Stop</button>
-          </div>
-          <div class="btn-group mr-1">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Status</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Settings</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Saves</button>
-          </div>
-          <div class="btn-group mr-1">
-            <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
-          </div>
+              size="sm"
+              variant="danger"
+            >Stop</b-button>
+          </b-button-group>
+          <b-button-group class="mr-1">
+            <b-button size="sm" variant="outline-secondary">Status</b-button>
+            <b-button size="sm" variant="outline-secondary">Settings</b-button>
+            <b-button size="sm" variant="outline-secondary">Saves</b-button>
+          </b-button-group>
+          <b-button-group class="mr-1">
+            <b-button size="sm" variant="outline-danger">Delete</b-button>
+          </b-button-group>
         </div>
-      </div>
-    </div>
-  </div>
+      </b-card-body>
+    </b-card>
+  </b-col>
 </template>
 
 <script lang="ts">
