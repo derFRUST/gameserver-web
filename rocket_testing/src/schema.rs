@@ -17,4 +17,7 @@ table! {
 
 joinable!(servers -> games (game_id));
 
-allow_tables_to_appear_in_same_query!(games, servers,);
+allow_tables_to_appear_in_same_query!(
+    games,
+    servers,
+);
