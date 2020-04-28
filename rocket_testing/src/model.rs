@@ -1,139 +1,114 @@
-pub trait Game {
-    fn id(&self) -> &str;
-    fn name(&self) -> &str;
-    fn image(&self) -> &str;
-}
+use crate::db::ConnectionPool;
+use diesel::prelude::*;
+use juniper::{FieldResult, RootNode};
 
-#[derive(juniper::GraphQLEnum, Copy, Clone, Eq, PartialEq, Debug)]
-pub enum ServerStatus {
-    Stopped,
-    Starting,
-    Started,
-    Stopping,
-}
-
-pub trait Server {
-    fn name(&self) -> &str;
-    fn game(&self) -> &str;
-    fn status(&self) -> &ServerStatus;
-}
-
-#[derive(Clone)]
-struct GameData {
-    id: String,
+#[derive(Queryable)]
+pub struct Game {
+    id: i32,
     name: String,
     image: String,
 }
 
-struct ServerData {
+#[derive(Queryable)]
+pub struct Server {
+    id: i32,
     name: String,
-    game: String,
-    status: ServerStatus,
+    game_id: i32,
+    status: String,
 }
 
-impl Game for GameData {
-    fn id(&self) -> &str {
+#[juniper::object(
+    Context = Context,
+)]
+impl Game {
+    pub fn id(&self) -> &i32 {
         &self.id
     }
 
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
-    fn image(&self) -> &str {
+    pub fn image(&self) -> &str {
         &self.image
     }
 }
 
-impl Server for ServerData {
-    fn name(&self) -> &str {
+#[juniper::object(
+    Context = Context,
+)]
+impl Server {
+    pub fn id(&self) -> &i32 {
+        &self.id
+    }
+
+    pub fn name(&self) -> &str {
         &self.name
     }
 
-    fn game(&self) -> &str {
-        &self.game
+    pub fn game(&self, context: &Context) -> FieldResult<Game> {
+        context.get_game(self.game_id)
     }
 
-    fn status(&self) -> &ServerStatus {
+    pub fn status(&self) -> &str {
         &self.status
     }
 }
 
-#[derive(Default)]
-pub struct Database {
-    games: Vec<GameData>,
-    servers: Vec<ServerData>,
+pub struct Context {
+    pub pool: ConnectionPool,
 }
 
-impl Database {
-    pub fn new() -> Database {
-        Database {
-            games: vec![
-                GameData {
-                    id: "factorio".to_owned(),
-                    name: "Factorio Experimental 0.18.18".to_owned(),
-                    image: "427520".to_owned(),
-                },
-                GameData {
-                    id: "satisfactory".to_owned(),
-                    name: "Satisfactory Early Access".to_owned(),
-                    image: "526870".to_owned(),
-                },
-            ],
-            servers: vec![
-                ServerData {
-                    name: "factorio-01".to_owned(),
-                    game: "factorio".to_owned(),
-                    status: ServerStatus::Stopped,
-                },
-                ServerData {
-                    name: "satisfactory-01".to_owned(),
-                    game: "satisfactory".to_owned(),
-                    status: ServerStatus::Started,
-                },
-            ],
-        }
+impl juniper::Context for Context {}
+
+impl Context {
+    pub fn get_game(&self, game_id: i32) -> FieldResult<Game> {
+        use crate::schema::games::dsl::*;
+        let connection = self.pool.get().unwrap();
+        Ok(games.filter(id.eq(game_id)).first(&connection)?)
     }
 
-    pub fn get_games(&self) -> Vec<&dyn Game> {
-        self.games.iter().map(|x| x as &dyn Game).collect()
-    }
-
-    pub fn get_game(&self, id: &str) -> Option<&dyn Game> {
-        self.games
-            .iter()
-            .filter(|&x| x.id == id)
-            .map(|x| x as &dyn Game)
-            .next()
-    }
-
-    pub fn get_servers(&self) -> Vec<&dyn Server> {
-        self.servers.iter().map(|x| x as &dyn Server).collect()
-    }
-
-    pub fn start_stop_server(&self, name: &str) -> Option<&dyn Server> {
-        println!("start_stop_server({})", name);
-
-        let server_option = self
-            .servers
-            .iter()
-            .filter(|&x| x.name == name)
-            .map(|x| x as &dyn Server)
-            .next();
-        if let Some(server) = server_option {
-            println!(
-                "Current status: {}",
-                match server.status() {
-                    ServerStatus::Stopped => "STOPPED",
-                    ServerStatus::Starting => "STARTING",
-                    ServerStatus::Started => "STARTED",
-                    ServerStatus::Stopping => "STOPPING",
-                }
-            );
-            // TODO: Change server status
-        }
-        server_option
+    pub fn get_server(&self, server_id: i32) -> FieldResult<Server> {
+        use crate::schema::servers::dsl::*;
+        let connection = self.pool.get().unwrap();
+        Ok(servers.filter(id.eq(server_id)).first(&connection)?)
     }
 }
 
-impl juniper::Context for Database {}
+pub struct Query;
+
+#[juniper::object(
+    Context = Context,
+)]
+impl Query {
+    fn games(context: &Context) -> FieldResult<Vec<Game>> {
+        use crate::schema::games::dsl::*;
+        let connection = context.pool.get().unwrap();
+        Ok(games.load(&connection)?)
+    }
+
+    fn servers(context: &Context) -> FieldResult<Vec<Server>> {
+        use crate::schema::servers::dsl::*;
+        let connection = context.pool.get().unwrap();
+        Ok(servers.load(&connection)?)
+    }
+}
+
+pub struct Mutations;
+
+#[juniper::object(
+    Context = Context,
+)]
+impl Mutations {
+    fn start_stop_server(context: &Context, server_id: i32) -> FieldResult<Server> {
+        let server = context.get_server(server_id)?;
+        println!("Current Status: {}", server.status);
+        Ok(server)
+    }
+}
+
+pub type Schema = RootNode<'static, Query, Mutations>;
+
+pub fn create_schema() -> Schema {
+    Schema::new(Query {}, Mutations {})
+}

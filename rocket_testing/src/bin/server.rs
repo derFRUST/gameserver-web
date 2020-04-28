@@ -1,9 +1,11 @@
 #![feature(decl_macro, proc_macro_hygiene)]
 
+use dotenv::dotenv;
 use rocket::{http::Method, response::content, State};
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
-use rocket_testing::{model::Database, graphql_schema::create_schema, graphql_schema::Schema};
+use rocket_testing::db::establish_connection;
+use rocket_testing::model::{create_schema, Context, Schema};
 
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
@@ -12,7 +14,7 @@ fn graphiql() -> content::Html<String> {
 
 #[rocket::post("/graphql", data = "<request>")]
 fn post_graphql_handler(
-    context: State<Database>,
+    context: State<Context>,
     request: juniper_rocket::GraphQLRequest,
     schema: State<Schema>,
 ) -> juniper_rocket::GraphQLResponse {
@@ -20,6 +22,8 @@ fn post_graphql_handler(
 }
 
 fn main() -> Result<(), Error> {
+    dotenv().ok();
+
     let cors = rocket_cors::CorsOptions {
         allowed_origins: AllowedOrigins::All,
         allowed_methods: vec![Method::Post].into_iter().map(From::from).collect(),
@@ -30,7 +34,9 @@ fn main() -> Result<(), Error> {
     .to_cors()?;
 
     rocket::ignite()
-        .manage(Database::new())
+        .manage(Context {
+            pool: establish_connection(),
+        })
         .manage(create_schema())
         .mount("/", rocket::routes![graphiql, post_graphql_handler])
         .attach(cors)

@@ -1,2 +1,6 @@
+#[macro_use]
+extern crate diesel;
+
+pub mod db;
 pub mod model;
-pub mod graphql_schema;
+pub mod schema;
