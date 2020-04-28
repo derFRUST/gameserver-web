@@ -1,2 +1,5 @@
 # rust build results
 /target
+
+# SQLite database
+database.sqlite3
