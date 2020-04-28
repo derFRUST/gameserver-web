@@ -29,7 +29,11 @@
             >Stop</b-button>
           </b-button-group>
           <b-button-group class="mr-1">
-            <b-button size="sm" variant="outline-secondary">Status</b-button>
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              :to="'/game-servers/' + server.name + '/status'"
+            >Status</b-button>
             <b-button size="sm" variant="outline-secondary">Settings</b-button>
             <b-button size="sm" variant="outline-secondary">Saves</b-button>
           </b-button-group>

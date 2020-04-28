@@ -10,15 +10,7 @@
 
         <b-collapse id="navbar" is-nav>
           <b-navbar-nav>
-            <b-nav-item-dropdown text="Game servers">
-              <b-dropdown-item href="#">factorio-01 (Factorio Experimental 0.18.18)</b-dropdown-item>
-              <b-dropdown-item href="#">satisfactory-01 (Satisfactory Early Access)</b-dropdown-item>
-              <b-dropdown-item href="#">Create new server</b-dropdown-item>
-            </b-nav-item-dropdown>
-
-            <b-nav-item href="#" disabled>Status</b-nav-item>
-            <b-nav-item href="#" disabled>Settings</b-nav-item>
-            <b-nav-item href="#" disabled>Saves</b-nav-item>
+            <b-nav-item to="/game-servers" active-class="active">Game servers</b-nav-item>
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
             <b-nav-item href>Users</b-nav-item>
