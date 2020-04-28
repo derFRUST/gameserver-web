@@ -3,7 +3,7 @@
 use rocket::{http::Method, response::content, State};
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
-use rocket_testing::{model::Database, schema::create_schema, schema::Schema};
+use rocket_testing::{model::Database, graphql_schema::create_schema, graphql_schema::Schema};
 
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
