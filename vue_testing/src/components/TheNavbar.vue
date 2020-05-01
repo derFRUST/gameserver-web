@@ -20,34 +20,16 @@
               :class="$route.name == 'game server' ? 'active' : ''"
               :text="$route.params.server_name"
             >
-              <ApolloQuery
-                :query="
-                  (gql) => gql`
-                    query {
-                      servers {
-                        name
-                      }
-                    }
-                  `
-                "
+              <b-dropdown-item
+                v-for="server in allServers"
+                :key="server.name"
+                :to="{
+                  name: $route.name,
+                  params: { server_name: server.name },
+                }"
+                active-class="active"
+                >{{ server.name }}</b-dropdown-item
               >
-                <!-- The result will automatically updated -->
-                <template slot-scope="{ result: { data, loading, error } }">
-                  <!-- Some content -->
-                  <div v-if="loading">Loading...</div>
-                  <div v-if="error">Error!</div>
-                  <b-dropdown-item
-                    v-for="server in data ? data.servers : []"
-                    :key="server.name"
-                    :to="{
-                      name: $route.name,
-                      params: { server_name: server.name },
-                    }"
-                    active-class="active"
-                    >{{ server.name }}</b-dropdown-item
-                  >
-                </template>
-              </ApolloQuery>
             </b-nav-item-dropdown>
             <b-nav-item-dropdown
               v-if="Object.keys(details).includes($route.name)"
@@ -81,8 +63,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { mapGetters } from "vuex";
 
-@Component
+@Component({
+  computed: mapGetters(["allServers"]),
+})
 export default class TheNavbar extends Vue {
   private details: { [name: string]: string } = {
     "game server settings": "Settings",

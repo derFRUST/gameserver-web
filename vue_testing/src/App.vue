@@ -13,8 +13,12 @@ import TheNavbar from "@/components/TheNavbar.vue";
 
 @Component({
   components: {
-    TheNavbar
-  }
+    TheNavbar,
+  },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  created() {
+    this.$store.dispatch("fetchServers", this.$apollo);
+  }
+}
 </script>
