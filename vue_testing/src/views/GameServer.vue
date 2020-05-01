@@ -21,9 +21,9 @@
                 <b-button size="sm" variant="danger">Stop</b-button>
               </b-button-group>
               <b-button-group class="mr-1">
-                <b-button size="sm" variant="outline-secondary" pressed>Status</b-button>
-                <b-button size="sm" variant="outline-secondary">Settings</b-button>
-                <b-button size="sm" variant="outline-secondary">Saves</b-button>
+                <b-button :to="{ name: 'game server', params: { sever_name: $route.params.server_name } }" size="sm" variant="outline-secondary" exact-active-class="active">Status</b-button>
+                <b-button :to="{ name: 'game server settings', params: { sever_name: $route.params.server_name } }" size="sm" variant="outline-secondary" exact-active-class="active">Settings</b-button>
+                <b-button :to="{ name: 'game server saves', params: { sever_name: $route.params.server_name } }" size="sm" variant="outline-secondary" exact-active-class="active">Saves</b-button>
               </b-button-group>
               <b-button-group class="mr-1">
                 <b-button size="sm" variant="outline-danger">Delete</b-button>

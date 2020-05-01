@@ -32,10 +32,18 @@
             <b-button
               size="sm"
               variant="outline-secondary"
-              :to="'/game-servers/' + server.name + '/status'"
+              :to="{ name: 'game server', params: { server_name: server.name } }"
             >Status</b-button>
-            <b-button size="sm" variant="outline-secondary">Settings</b-button>
-            <b-button size="sm" variant="outline-secondary">Saves</b-button>
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              :to="{ name: 'game server settings', params: { server_name: server.name } }"
+            >Settings</b-button>
+            <b-button
+              size="sm"
+              variant="outline-secondary"
+              :to="{ name: 'game server saves', params: { server_name: server.name } }"
+            >Saves</b-button>
           </b-button-group>
           <b-button-group class="mr-1">
             <b-button size="sm" variant="outline-danger">Delete</b-button>

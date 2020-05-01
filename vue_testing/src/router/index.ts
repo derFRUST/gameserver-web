@@ -3,23 +3,39 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import GameServers from '../views/GameServers.vue'
 import GameServer from '../views/GameServer.vue'
 import GameServerStatus from '../views/GameServerStatus.vue'
+import GameServerSettings from '../views/GameServerSettings.vue'
+import GameServerSaves from '../views/GameServerSaves.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
+    path: '/',
+    redirect: '/game-servers'
+  },
+  {
     path: '/game-servers',
-    name: 'Game servers',
+    name: 'game servers',
     component: GameServers,
   },
   {
     path: '/game-servers/:server_name',
-    name: 'Game servers',
     component: GameServer,
     children: [
       {
-        path: 'status',
+        path: '',
+        name: 'game server',
         component: GameServerStatus
+      },
+      {
+        path: 'settings',
+        name: 'game server settings',
+        component: GameServerSettings
+      },
+      {
+        path: 'saves',
+        name: 'game server saves',
+        component: GameServerSaves
       }
     ]
     // route level code-splitting
