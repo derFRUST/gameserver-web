@@ -1,0 +1,5 @@
+// Vetur does not find tsconfig when VSCode is started outside of Vue project root.
+// https://github.com/vuejs/vetur/issues/424
+{
+    "extends": "./vue_testing/tsconfig.json"
+}

@@ -2,13 +2,16 @@
   <b-col lg="4" md="6" class="mt-4 d-flex">
     <b-card :img-src="image" :img-alt="server.game.name" no-body class="shadow">
       <b-card-body class="d-flex flex-column">
-        <b-card-title>{{server.name}}</b-card-title>
+        <b-card-title>{{ server.name }}</b-card-title>
         <b-card-text>
-          {{server.game.name}}
+          {{ server.game.name }}
           <br />Status:
           <span :class="statusClassMap[server.status]">
-            {{server.status.toLowerCase()}}
-            <b-spinner small v-if="server.status == 'STOPPING' || server.status == 'STARTING'" />
+            {{ server.status.toLowerCase() }}
+            <b-spinner
+              small
+              v-if="server.status == 'STOPPING' || server.status == 'STARTING'"
+            />
           </span>
         </b-card-text>
         <div class="flex-column mt-auto">
@@ -19,31 +22,45 @@
               @click="startServer"
               size="sm"
               variant="success"
-            >Start</b-button>
+              >Start</b-button
+            >
             <b-button
               v-if="server.status == 'STOPPING' || server.status == 'STARTED'"
               :disabled="server.status == 'STOPPING'"
               @click="stopServer"
               size="sm"
               variant="danger"
-            >Stop</b-button>
+              >Stop</b-button
+            >
           </b-button-group>
           <b-button-group class="mr-1">
             <b-button
               size="sm"
               variant="outline-secondary"
-              :to="{ name: 'game server', params: { server_name: server.name } }"
-            >Status</b-button>
+              :to="{
+                name: 'game server',
+                params: { server_name: server.name },
+              }"
+              >Status</b-button
+            >
             <b-button
               size="sm"
               variant="outline-secondary"
-              :to="{ name: 'game server settings', params: { server_name: server.name } }"
-            >Settings</b-button>
+              :to="{
+                name: 'game server settings',
+                params: { server_name: server.name },
+              }"
+              >Settings</b-button
+            >
             <b-button
               size="sm"
               variant="outline-secondary"
-              :to="{ name: 'game server saves', params: { server_name: server.name } }"
-            >Saves</b-button>
+              :to="{
+                name: 'game server saves',
+                params: { server_name: server.name },
+              }"
+              >Saves</b-button
+            >
           </b-button-group>
           <b-button-group class="mr-1">
             <b-button size="sm" variant="outline-danger">Delete</b-button>
@@ -56,13 +73,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from "vue-property-decorator";
-
-const statusClassMap = Object.freeze({
-  STOPPED: "text-danger",
-  STARTING: "text-success",
-  STARTED: "text-success",
-  STOPPING: "text-danger"
-});
+import { statusClassMap } from "@/utils/constants";
 
 @Component
 export default class ServerCard extends Vue {
