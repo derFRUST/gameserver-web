@@ -1,5 +1,6 @@
-import gql from "graphql-tag";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+import DollarApollo from "vue-apollo"
+import gql from "graphql-tag";
 import { Server } from "@/models/definitions";
 
 @Module
@@ -12,7 +13,7 @@ export default class Servers extends VuexModule {
   }
 
   @Action({ commit: "setServers" })
-  async fetchServers(apollo: any) {
+  async fetchServers(apollo: DollarApollo) {
     let result = [];
     try {
       const response = await apollo.query({

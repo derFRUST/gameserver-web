@@ -104,6 +104,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { mapGetters } from "vuex";
 import { statusClassMap } from "@/utils/constants";
+import { Server } from "@/models/definitions";
 
 @Component({
   computed: mapGetters(["allServers"]),
@@ -111,7 +112,7 @@ import { statusClassMap } from "@/utils/constants";
 export default class GameServer extends Vue {
   private statusClassMap = statusClassMap;
 
-  allServers!: any[];
+  allServers!: Server[];
 
   get server() {
     if (this.allServers) {
