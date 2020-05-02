@@ -2,32 +2,31 @@
   <b-container>
     <div class="text-center">
       <h1 class="display-4">Game servers</h1>
-      <p class="lead">You can create new servers and manage your existing ones here.</p>
+      <p class="lead">
+        You can create new servers and manage your existing ones here.
+      </p>
     </div>
 
     <b-row>
-      <ServerCard
-        @start-server="startServer"
-        @stop-server="stopServer"
+      <b-col
+        lg="4"
+        md="6"
+        class="d-flex mt-2 mt-lg-0 mt-xl-2 px-lg-1 px-xl-3"
         :key="server.name"
-        :server="server"
-        :image="'https://steamcdn-a.akamaihd.net/steam/apps/' + server.game.image + '/header.jpg'"
         v-for="server in allServers"
-      />
-      <b-col lg="4" md="6" class="mt-4 d-flex">
-        <b-card
-          :img-src="require('../assets/servers_create.png')"
-          img-alt="Create"
-          no-body
-          class="shadow"
-        >
-          <b-card-body class="d-flex flex-column">
-            <b-card-title>Create new server</b-card-title>
-            <div class="flex-column mt-auto">
-              <b-button variant="primary" size="sm">Create</b-button>
-            </div>
-          </b-card-body>
-        </b-card>
+      >
+        <ServerCard
+          @start-server="startServer"
+          @stop-server="stopServer"
+          layout="vertical"
+          :server="server"
+        />
+      </b-col>
+      <b-col lg="4" md="6" class="d-flex mt-2 mt-lg-0 mt-xl-2 px-lg-1 px-xl-3">
+        <ServerCard
+          layout="vertical"
+          create="true"
+        />
       </b-col>
     </b-row>
   </b-container>
@@ -40,9 +39,9 @@ import ServerCard from "@/components/ServerCard.vue";
 
 @Component({
   components: {
-    ServerCard
+    ServerCard,
   },
-  computed: mapGetters(["allServers"])
+  computed: mapGetters(["allServers"]),
 })
 export default class GameServers extends Vue {
   private startServer(server: Record<string, string>): void {
