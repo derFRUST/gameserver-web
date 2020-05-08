@@ -11,7 +11,7 @@
         '/header.jpg'
       "
     />
-    <router-view></router-view>
+    <router-view :server="server"></router-view>
   </b-container>
 </template>
 

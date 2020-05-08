@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import DollarApollo from "vue-apollo";
 import gql from "graphql-tag";
-import { Server } from "@/models/definitions";
+import { Server, ServerUpdate } from "@/models/definitions";
 
 @Module
 export default class Servers extends VuexModule {
@@ -10,6 +10,12 @@ export default class Servers extends VuexModule {
   @Mutation
   setServers(servers: Server[]) {
     this.servers = servers;
+  }
+
+  @Mutation
+  updateServer(serverUpdate: ServerUpdate) {
+    const serverIndex = this.servers.findIndex((s) => s.id == serverUpdate.id);
+    this.servers[serverIndex].name = serverUpdate.name;
   }
 
   @Action({ commit: "setServers" })
@@ -37,6 +43,12 @@ export default class Servers extends VuexModule {
       console.log(e);
     }
     return result;
+  }
+
+  @Action({ commit: "updateServer" })
+  saveServer(serverUpdate: ServerUpdate) {
+    console.log("updateServer", serverUpdate);
+    return serverUpdate;
   }
 
   get allServers() {

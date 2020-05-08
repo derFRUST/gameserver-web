@@ -10,3 +10,9 @@ export interface Server {
   game: Game;
   status: string;
 }
+
+export interface ServerUpdate {
+  id: number;
+  name: string;
+  gameId: number;
+}
