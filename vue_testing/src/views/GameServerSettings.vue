@@ -17,6 +17,18 @@
           ></b-input>
         </b-col>
       </b-row>
+      <b-row class="justify-content-center">
+        <b-col cols="4" class="text-right"
+          ><label for="inline-form-input-name">Game ID:</label></b-col
+        >
+        <b-col cols="4">
+          <b-input
+            id="server-game-id"
+            v-model="gameId"
+            class="mb-2 mr-sm-2 mb-sm-0"
+          ></b-input>
+        </b-col>
+      </b-row>
       <b-row class="justify-content-center mt-4">
         <b-col cols="1">
           <b-button type="submit" variant="primary">Save</b-button>
@@ -34,18 +46,21 @@ import { Server, ServerUpdate } from "@/models/definitions";
 export default class GameServerSettings extends Vue {
   @Prop() readonly server!: Server;
   private name = "";
+  private gameId = 0;
+
   private onSubmit(): void {
     const serverUpdate: ServerUpdate = {
       id: this.server.id,
       name: this.name,
-      gameId: this.server.game.id,
+      gameId: this.gameId,
     };
-    this.$store.dispatch("saveServer", serverUpdate);
+    this.$store.dispatch("saveServer", { apollo: this.$apollo, serverUpdate });
   }
 
   private initForm() {
     if (this.server) {
       this.name = this.server.name;
+      this.gameId = this.server.game.id;
     }
   }
 

@@ -1,3 +1,4 @@
+import Vue from "vue";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import DollarApollo from "vue-apollo";
 import gql from "graphql-tag";
@@ -13,9 +14,11 @@ export default class Servers extends VuexModule {
   }
 
   @Mutation
-  updateServer(serverUpdate: ServerUpdate) {
-    const serverIndex = this.servers.findIndex((s) => s.id == serverUpdate.id);
-    this.servers[serverIndex].name = serverUpdate.name;
+  updateServer(server: Server) {
+    if (server) {
+      const serverIndex = this.servers.findIndex((s) => s.id == server.id);
+      Vue.set(this.servers, serverIndex, server);
+    }
   }
 
   @Action({ commit: "setServers" })
@@ -46,9 +49,37 @@ export default class Servers extends VuexModule {
   }
 
   @Action({ commit: "updateServer" })
-  saveServer(serverUpdate: ServerUpdate) {
-    console.log("updateServer", serverUpdate);
-    return serverUpdate;
+  async saveServer({
+    apollo,
+    serverUpdate,
+  }: {
+    apollo: DollarApollo;
+    serverUpdate: ServerUpdate;
+  }) {
+    try {
+      const response = await apollo.mutate({
+        mutation: gql`
+          mutation rename {
+            server: updateServer(
+              serverUpdate: { id: ${serverUpdate.id}, name: "${serverUpdate.name}", gameId: ${serverUpdate.gameId} }
+            ) {
+              id
+              name
+              game {
+                id
+                name
+                image
+              }
+              status
+            }
+          }
+        `,
+      });
+      return response.data.server;
+    } catch (e) {
+      console.log(e);
+      return undefined;
+    }
   }
 
   get allServers() {

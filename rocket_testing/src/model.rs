@@ -2,6 +2,8 @@ use crate::db::ConnectionPool;
 use diesel::prelude::*;
 use juniper::{FieldResult, RootNode};
 
+use crate::schema::servers;
+
 #[derive(Queryable)]
 pub struct Game {
     id: i32,
@@ -9,12 +11,19 @@ pub struct Game {
     image: String,
 }
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable)]
 pub struct Server {
     id: i32,
     name: String,
     game_id: i32,
     status: String,
+}
+
+#[derive(juniper::GraphQLInputObject)]
+pub struct ServerUpdate {
+    id: i32,
+    name: String,
+    game_id: i32,
 }
 
 #[juniper::object(
@@ -73,6 +82,18 @@ impl Context {
         let connection = self.pool.get().unwrap();
         Ok(servers.filter(id.eq(server_id)).first(&connection)?)
     }
+
+    pub fn update_server(&self, server_update: ServerUpdate) -> FieldResult<Server> {
+        use crate::schema::servers::dsl::*;
+        let connection = self.pool.get().unwrap();
+        diesel::update(servers.find(server_update.id))
+            .set((
+                name.eq(server_update.name),
+                game_id.eq(server_update.game_id),
+            ))
+            .execute(&connection)?;
+        Ok(servers.filter(id.eq(server_update.id)).first(&connection)?)
+    }
 }
 
 pub struct Query;
@@ -104,6 +125,10 @@ impl Mutations {
         let server = context.get_server(server_id)?;
         println!("Current Status: {}", server.status);
         Ok(server)
+    }
+
+    fn update_server(context: &Context, server_update: ServerUpdate) -> FieldResult<Server> {
+        context.update_server(server_update)
     }
 }
 
