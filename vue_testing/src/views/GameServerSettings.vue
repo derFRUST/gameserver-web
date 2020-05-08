@@ -28,7 +28,6 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Route } from "vue-router";
 import { Server, ServerUpdate } from "@/models/definitions";
 
 @Component
@@ -55,7 +54,7 @@ export default class GameServerSettings extends Vue {
   }
 
   @Watch("server")
-  private onServerChange(to: Server, from: Server) {
+  private onServerChange(/* to: Server, from: Server */) {
     this.initForm();
   }
 }
