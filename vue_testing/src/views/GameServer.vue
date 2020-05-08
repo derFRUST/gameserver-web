@@ -7,8 +7,8 @@
       :server="server"
       :image="
         'https://steamcdn-a.akamaihd.net/steam/apps/' +
-          server.game.image +
-          '/header.jpg'
+        server.game.image +
+        '/header.jpg'
       "
     />
     <router-view></router-view>

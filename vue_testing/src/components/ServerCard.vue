@@ -9,8 +9,8 @@
           v-if="!create"
           :src="
             'https://steamcdn-a.akamaihd.net/steam/apps/' +
-              server.game.image +
-              '/header.jpg'
+            server.game.image +
+            '/header.jpg'
           "
           :alt="server.game.name"
         />

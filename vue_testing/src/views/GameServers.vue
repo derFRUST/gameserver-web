@@ -23,10 +23,7 @@
         />
       </b-col>
       <b-col lg="4" md="6" class="d-flex mt-2 mt-lg-0 mt-xl-2 px-lg-1 px-xl-3">
-        <ServerCard
-          layout="vertical"
-          create="true"
-        />
+        <ServerCard layout="vertical" create="true" />
       </b-col>
     </b-row>
   </b-container>
