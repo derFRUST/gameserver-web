@@ -114,18 +114,19 @@
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from "vue-property-decorator";
 import { statusClassMap } from "@/utils/constants";
+import { Server } from "@/models/definitions";
 
 @Component
 export default class ServerCard extends Vue {
   @Prop({ required: true }) readonly layout!: string;
   @Prop({ default: false }) readonly create!: boolean;
-  @Prop({ required: false }) readonly server!: Record<string, string>;
+  @Prop({ required: false }) readonly server!: Server;
   @Emit()
-  private startServer(): Record<string, string> {
+  private startServer(): Server {
     return this.server;
   }
   @Emit()
-  private stopServer(): Record<string, string> {
+  private stopServer(): Server {
     return this.server;
   }
   private statusClassMap = statusClassMap;
