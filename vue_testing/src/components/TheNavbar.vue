@@ -15,11 +15,7 @@
               exact-active-class="active"
               >Game servers</b-nav-item
             >
-            <b-nav-item-dropdown
-              v-if="server"
-              :class="$route.name == 'game server' ? 'active' : ''"
-              :text="server.name"
-            >
+            <b-nav-item-dropdown v-if="server" :text="server.name">
               <b-dropdown-item
                 v-for="server in allServers"
                 :key="server.name"
@@ -72,6 +68,7 @@ import { Server } from "@/models/definitions";
 export default class TheNavbar extends Vue {
   serverLookup!: (id: number) => Server;
   private details: { [name: string]: string } = {
+    "game server": "Status",
     "game server settings": "Settings",
     "game server saves": "Saves",
   };
