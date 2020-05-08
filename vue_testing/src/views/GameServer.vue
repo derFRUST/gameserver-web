@@ -25,18 +25,13 @@ import { Server } from "@/models/definitions";
   components: {
     ServerCard,
   },
-  computed: mapGetters(["allServers"]),
+  computed: mapGetters(["serverLookup"]),
 })
 export default class GameServer extends Vue {
-  allServers!: Server[];
+  serverLookup!: (id: number) => Server;
 
   get server() {
-    if (this.allServers) {
-      return this.allServers.find(
-        (s) => s.name == this.$route.params.server_name
-      );
-    }
-    return undefined;
+    return this.serverLookup(+this.$route.params.server_id);
   }
 }
 </script>

@@ -1,5 +1,5 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import DollarApollo from "vue-apollo"
+import DollarApollo from "vue-apollo";
 import gql from "graphql-tag";
 import { Server } from "@/models/definitions";
 
@@ -41,5 +41,8 @@ export default class Servers extends VuexModule {
 
   get allServers() {
     return this.servers;
+  }
+  get serverLookup() {
+    return (id: number) => this.allServers.find((s) => s.id == id);
   }
 }

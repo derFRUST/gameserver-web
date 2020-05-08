@@ -68,7 +68,7 @@
                 variant="outline-secondary"
                 :to="{
                   name: 'game server',
-                  params: { server_name: server.name },
+                  params: { server_id: server.id },
                 }"
                 exact-active-class="active"
                 >Status</b-button
@@ -78,7 +78,7 @@
                 variant="outline-secondary"
                 :to="{
                   name: 'game server settings',
-                  params: { server_name: server.name },
+                  params: { server_id: server.id },
                 }"
                 exact-active-class="active"
                 >Settings</b-button
@@ -88,7 +88,7 @@
                 variant="outline-secondary"
                 :to="{
                   name: 'game server saves',
-                  params: { server_name: server.name },
+                  params: { server_id: server.id },
                 }"
                 exact-active-class="active"
                 >Saves</b-button
