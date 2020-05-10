@@ -1,0 +1,6 @@
+projects:
+  gameserver-web:
+    schemaPath: graphql/schema.graphql
+    extensions:
+      endpoints:
+        dev: 'http://[::1]:8100/graphql/'
