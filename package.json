@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "graphql": "latest",
+    "graphql-cli": "next",
+    "@test-graphql-cli/codegen": "next",
+    "@graphql-codegen/typescript": "latest",
+    "prettier": "latest"
+  }
+}

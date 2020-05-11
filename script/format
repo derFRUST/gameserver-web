@@ -1,0 +1,10 @@
+#!/bin/sh
+
+command="node_modules/.bin/prettier graphql/ vue_testing/src/ --write --end-of-line auto"
+echo $command
+$command
+
+cd rocket_testing
+command="cargo fmt"
+echo $command
+$command
