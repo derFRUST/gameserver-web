@@ -1,6 +1,15 @@
 projects:
-  gameserver-web:
+  default:
     schemaPath: graphql/schema.graphql
     extensions:
+      codegen:
+        generates:
+          vue_testing/src/models/graphql-generated.ts:
+            plugins:
+              - typescript
+              # - typescript-operations
+              # - typescript-vue-apollo
+            config:
+              withHooks: true
       endpoints:
-        dev: 'http://[::1]:8100/graphql/'
+        dev: "http://[::1]:8100/graphql/"

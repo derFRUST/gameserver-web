@@ -13,6 +13,7 @@ edition = "2018"
 dotenv = "0.15.0"
 juniper = "0.14.2"
 juniper_rocket = "0.5.2"
+juniper-from-schema = "0.5.2"
 rocket = "0.4.4"
 rocket_cors = "0.5.1"
 

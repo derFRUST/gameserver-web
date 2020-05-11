@@ -1,9 +1,27 @@
-# source: http://[::1]:8100/graphql/
-# timestamp: Sun May 10 2020 18:06:56 GMT+0200 (GMT+02:00)
+# This schema will be used by:
+# - "grapyql codegen" for generating vue_testing/src/models/graphql-generated.ts
+# - juniper_from_schema::graphql_schema_from_file in rocket_testing/src/model.rs
+
+directive @juniper(
+  ownership: String = "borrowed"
+  infallible: Boolean = false
+  with_time_zone: Boolean = true
+) on FIELD_DEFINITION
 
 schema {
   query: Query
-  mutation: Mutations
+  mutation: Mutation
+}
+
+type Query {
+  games: [Game!]! @juniper(ownership: "owned")
+  servers: [Server!]! @juniper(ownership: "owned")
+}
+
+type Mutation {
+  startStopServer(serverId: Int!): Server! @juniper(ownership: "owned")
+  updateServer(serverUpdate: ServerUpdate!): Server!
+    @juniper(ownership: "owned")
 }
 
 type Game {
@@ -12,20 +30,10 @@ type Game {
   image: String!
 }
 
-type Mutations {
-  startStopServer(serverId: Int!): Server!
-  updateServer(serverUpdate: ServerUpdate!): Server!
-}
-
-type Query {
-  games: [Game!]!
-  servers: [Server!]!
-}
-
 type Server {
   id: Int!
   name: String!
-  game: Game!
+  game: Game! @juniper(ownership: "owned")
   status: String!
 }
 

@@ -1,8 +1,11 @@
 use crate::db::ConnectionPool;
 use diesel::prelude::*;
-use juniper::{FieldResult, RootNode};
+use juniper::{Executor, FieldResult};
+use juniper_from_schema::graphql_schema_from_file;
 
 use crate::schema::servers;
+
+graphql_schema_from_file!("../graphql/schema.graphql");
 
 #[derive(Queryable)]
 pub struct Game {
@@ -19,48 +22,39 @@ pub struct Server {
     status: String,
 }
 
-#[derive(juniper::GraphQLInputObject)]
-pub struct ServerUpdate {
-    id: i32,
-    name: String,
-    game_id: i32,
-}
-
-#[juniper::object(
-    Context = Context,
-)]
-impl Game {
-    pub fn id(&self) -> &i32 {
-        &self.id
+impl GameFields for Game {
+    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&i32> {
+        Ok(&self.id)
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
+        Ok(&self.name)
     }
 
-    pub fn image(&self) -> &str {
-        &self.image
+    fn field_image(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
+        Ok(&self.image)
     }
 }
 
-#[juniper::object(
-    Context = Context,
-)]
-impl Server {
-    pub fn id(&self) -> &i32 {
-        &self.id
+impl ServerFields for Server {
+    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&i32> {
+        Ok(&self.id)
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
+        Ok(&self.name)
     }
 
-    pub fn game(&self, context: &Context) -> FieldResult<Game> {
-        context.get_game(self.game_id)
+    fn field_game(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, Game, juniper_from_schema::Walked>,
+    ) -> FieldResult<Game> {
+        executor.context().get_game(self.game_id)
     }
 
-    pub fn status(&self) -> &str {
-        &self.status
+    fn field_status(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
+        Ok(&self.status)
     }
 }
 
@@ -98,42 +92,52 @@ impl Context {
 
 pub struct Query;
 
-#[juniper::object(
-    Context = Context,
-)]
-impl Query {
-    fn games(context: &Context) -> FieldResult<Vec<Game>> {
+impl QueryFields for Query {
+    fn field_games(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, Game, Walked>,
+    ) -> FieldResult<Vec<Game>> {
         use crate::schema::games::dsl::*;
-        let connection = context.pool.get().unwrap();
+        let connection = executor.context().pool.get().unwrap();
         Ok(games.load(&connection)?)
     }
 
-    fn servers(context: &Context) -> FieldResult<Vec<Server>> {
+    fn field_servers(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, Server, Walked>,
+    ) -> FieldResult<Vec<Server>> {
         use crate::schema::servers::dsl::*;
-        let connection = context.pool.get().unwrap();
+        let connection = executor.context().pool.get().unwrap();
         Ok(servers.load(&connection)?)
     }
 }
 
-pub struct Mutations;
+pub struct Mutation;
 
-#[juniper::object(
-    Context = Context,
-)]
-impl Mutations {
-    fn start_stop_server(context: &Context, server_id: i32) -> FieldResult<Server> {
-        let server = context.get_server(server_id)?;
+impl MutationFields for Mutation {
+    fn field_start_stop_server(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, Server, Walked>,
+        server_id: i32,
+    ) -> FieldResult<Server> {
+        let server = executor.context().get_server(server_id)?;
         println!("Current Status: {}", server.status);
         Ok(server)
     }
 
-    fn update_server(context: &Context, server_update: ServerUpdate) -> FieldResult<Server> {
-        context.update_server(server_update)
+    fn field_update_server(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, Server, Walked>,
+        server_update: ServerUpdate,
+    ) -> FieldResult<Server> {
+        executor.context().update_server(server_update)
     }
 }
 
-pub type Schema = RootNode<'static, Query, Mutations>;
-
 pub fn create_schema() -> Schema {
-    Schema::new(Query {}, Mutations {})
+    Schema::new(Query {}, Mutation)
 }
