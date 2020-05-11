@@ -1,3 +1,4 @@
 #!/bin/sh
 
 node_modules/.bin/graphql codegen
+node_modules/.bin/prettier vue_testing/src/models/graphql-generated.ts --write --end-of-line auto
