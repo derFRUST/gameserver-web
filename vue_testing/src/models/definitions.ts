@@ -1,1 +1,1 @@
-export { Game, Server, ServerUpdate } from "./graphql-generated";
+export * from "./graphql-generated";

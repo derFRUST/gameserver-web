@@ -2,7 +2,7 @@ import Vue from "vue";
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 import DollarApollo from "vue-apollo";
 import gql from "graphql-tag";
-import { Server, ServerUpdate } from "@/models/definitions";
+import { Server, UpdateServerInput, ServerPayload } from "@/models/definitions";
 
 @Module
 export default class Servers extends VuexModule {
@@ -14,11 +14,11 @@ export default class Servers extends VuexModule {
   }
 
   @Mutation
-  updateServer(server: Server) {
-    if (server) {
-      const serverIndex = this.servers.findIndex((s) => s.id == server.id);
-      Vue.set(this.servers, serverIndex, server);
-    }
+  updateServer(serverPayload: ServerPayload) {
+    const serverIndex = this.servers.findIndex(
+      (s) => s.id == serverPayload.server.id
+    );
+    Vue.set(this.servers, serverIndex, serverPayload.server);
   }
 
   @Action({ commit: "setServers" })
@@ -51,31 +51,33 @@ export default class Servers extends VuexModule {
   @Action({ commit: "updateServer" })
   async saveServer({
     apollo,
-    serverUpdate,
+    input,
   }: {
     apollo: DollarApollo;
-    serverUpdate: ServerUpdate;
+    input: UpdateServerInput;
   }) {
     try {
       const response = await apollo.mutate({
         mutation: gql`
-          mutation rename {
-            server: updateServer(
-              serverUpdate: { id: ${serverUpdate.id}, name: "${serverUpdate.name}", gameId: ${serverUpdate.gameId} }
+          mutation {
+            updateServer(
+              input: { id: ${input.id}, name: "${input.name}", gameId: ${input.gameId} }
             ) {
-              id
-              name
-              game {
+              server {
                 id
                 name
-                image
+                game {
+                  id
+                  name
+                  image
+                }
+                status
               }
-              status
             }
           }
         `,
       });
-      return response.data.server;
+      return response.data.updateServer;
     } catch (e) {
       console.log(e);
       return undefined;
@@ -86,6 +88,6 @@ export default class Servers extends VuexModule {
     return this.servers;
   }
   get serverLookup() {
-    return (id: number) => this.allServers.find((s) => s.id == id);
+    return (id: string) => this.allServers.find((s) => s.id == id);
   }
 }

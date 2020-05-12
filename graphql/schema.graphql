@@ -18,27 +18,49 @@ type Query {
   servers: [Server!]! @juniper(ownership: "owned")
 }
 
-type Mutation {
-  startStopServer(serverId: Int!): Server! @juniper(ownership: "owned")
-  updateServer(serverUpdate: ServerUpdate!): Server!
-    @juniper(ownership: "owned")
+type Game {
+  id: ID! @juniper(ownership: "owned")
+  name: String!
+  image: String @juniper(ownership: "owned")
 }
 
-type Game {
-  id: Int!
-  name: String!
-  image: String!
+enum ServerStatus {
+  STOPPED
+  STARTING
+  STARTED
+  STOPPING
 }
 
 type Server {
-  id: Int!
+  id: ID! @juniper(ownership: "owned")
   name: String!
   game: Game! @juniper(ownership: "owned")
-  status: String!
+  status: ServerStatus! @juniper(ownership: "owned")
 }
 
-input ServerUpdate {
-  id: Int!
+type Mutation {
+  updateServer(input: UpdateServerInput!): ServerPayload!
+    @juniper(ownership: "owned")
+  startServer(input: StartServerInput!): ServerPayload!
+    @juniper(ownership: "owned")
+  stopServer(input: StopServerInput!): ServerPayload!
+    @juniper(ownership: "owned")
+}
+
+input UpdateServerInput {
+  id: ID!
   name: String!
-  gameId: Int!
+  gameId: ID!
+}
+
+type ServerPayload {
+  server: Server!
+}
+
+input StartServerInput {
+  id: ID!
+}
+
+input StopServerInput {
+  id: ID!
 }

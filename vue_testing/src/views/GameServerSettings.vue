@@ -40,21 +40,21 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Server, ServerUpdate } from "@/models/definitions";
+import { Server, UpdateServerInput } from "@/models/definitions";
 
 @Component
 export default class GameServerSettings extends Vue {
   @Prop() readonly server!: Server;
   private name = "";
-  private gameId = 0;
+  private gameId = "";
 
   private onSubmit(): void {
-    const serverUpdate: ServerUpdate = {
+    const input: UpdateServerInput = {
       id: this.server.id,
       name: this.name,
       gameId: this.gameId,
     };
-    this.$store.dispatch("saveServer", { apollo: this.$apollo, serverUpdate });
+    this.$store.dispatch("saveServer", { apollo: this.$apollo, input });
   }
 
   private initForm() {
