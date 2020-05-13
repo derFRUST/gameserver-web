@@ -3,13 +3,15 @@ use diesel::prelude::*;
 use juniper::{Executor, FieldResult, ID};
 use juniper_from_schema::graphql_schema_from_file;
 
+use crate::types;
+
 use crate::schema::servers;
 
 graphql_schema_from_file!("../graphql/schema.graphql");
 
 #[derive(Queryable)]
 pub struct Game {
-    id: i32,
+    id: types::Id,
     name: String,
     image: String, // TODO: Change to Option<String>?
 }
@@ -39,9 +41,9 @@ impl Into<ServerStatus> for String {
 
 #[derive(Identifiable, Queryable)]
 pub struct Server {
-    id: i32,
+    id: types::Id,
     name: String,
-    game_id: i32,
+    game_id: types::Id,
     status: String,
 }
 
@@ -50,8 +52,8 @@ pub struct ServerPayload {
 }
 
 impl GameFields for Game {
-    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<ID> {
-        Ok(self.id.to_string().into())
+    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&ID> {
+        Ok(&self.id.id)
     }
 
     fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
@@ -64,8 +66,8 @@ impl GameFields for Game {
 }
 
 impl ServerFields for Server {
-    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<ID> {
-        Ok(self.id.to_string().into())
+    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&ID> {
+        Ok(&self.id.id)
     }
 
     fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
@@ -77,7 +79,7 @@ impl ServerFields for Server {
         executor: &Executor<'_, Context>,
         _: &QueryTrail<'_, Game, juniper_from_schema::Walked>,
     ) -> FieldResult<Game> {
-        executor.context().get_game(self.game_id.to_string().into())
+        executor.context().get_game(&self.game_id)
     }
 
     fn field_status(&self, _: &Executor<'_, Context>) -> FieldResult<ServerStatus> {
@@ -102,26 +104,24 @@ pub struct Context {
 impl juniper::Context for Context {}
 
 impl Context {
-    pub fn get_game(&self, input_id: ID) -> FieldResult<Game> {
+    pub fn get_game(&self, input_id: &types::Id) -> FieldResult<Game> {
         use crate::schema::games::dsl::*;
-        let input_id: i32 = input_id.to_string().parse()?;
         let connection = self.pool.get().unwrap();
         Ok(games.filter(id.eq(input_id)).first(&connection)?)
     }
 
-    pub fn get_server(&self, input_id: ID) -> FieldResult<Server> {
+    pub fn get_server(&self, input_id: types::Id) -> FieldResult<Server> {
         use crate::schema::servers::dsl::*;
-        let input_id: i32 = input_id.to_string().parse()?;
         let connection = self.pool.get().unwrap();
         Ok(servers.filter(id.eq(input_id)).first(&connection)?)
     }
 
     pub fn update_server(&self, input: UpdateServerInput) -> FieldResult<Server> {
         use crate::schema::servers::dsl::*;
-        let input_id: i32 = input.id.to_string().parse()?;
-        let input_game_id: i32 = input.game_id.to_string().parse()?;
+        let input_id: types::Id = input.id.into();
+        let input_game_id: types::Id = input.game_id.into();
         let connection = self.pool.get().unwrap();
-        diesel::update(servers.find(input_id))
+        diesel::update(servers.find(&input_id))
             .set((name.eq(input.name), game_id.eq(input_game_id)))
             .execute(&connection)?;
         Ok(servers.filter(id.eq(input_id)).first(&connection)?)
@@ -161,7 +161,7 @@ impl MutationFields for Mutation {
         _: &QueryTrail<'_, ServerPayload, Walked>,
         input: StartServerInput,
     ) -> FieldResult<ServerPayload> {
-        let server = executor.context().get_server(input.id)?;
+        let server = executor.context().get_server(input.id.into())?;
         println!("Current Status: {}", server.status);
         Ok(ServerPayload { server })
     }
@@ -172,7 +172,7 @@ impl MutationFields for Mutation {
         _: &QueryTrail<'_, ServerPayload, Walked>,
         input: StopServerInput,
     ) -> FieldResult<ServerPayload> {
-        let server = executor.context().get_server(input.id)?;
+        let server = executor.context().get_server(input.id.into())?;
         println!("Current Status: {}", server.status);
         Ok(ServerPayload { server })
     }
