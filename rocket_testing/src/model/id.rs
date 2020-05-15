@@ -5,7 +5,7 @@ use diesel::sql_types::*;
 use std::hash::{Hash, Hasher};
 use std::io;
 
-#[derive(Debug, Clone, PartialEq, Eq, AsExpression, FromSqlRow)]
+#[derive(Debug, Clone, Eq, AsExpression, FromSqlRow)]
 #[sql_type = "Integer"]
 pub struct Id {
     id: juniper::ID,
@@ -26,6 +26,12 @@ impl From<juniper::ID> for Id {
 impl Hash for Id {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
+    }
+}
+
+impl PartialEq for Id {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
     }
 }
 
