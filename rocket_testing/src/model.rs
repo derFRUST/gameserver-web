@@ -1,7 +1,15 @@
 use crate::db::ConnectionPool;
+use diesel::backend::Backend;
+use diesel::deserialize::{self, FromSql, FromSqlRow};
 use diesel::prelude::*;
+use diesel::row;
+use diesel::serialize::{self, Output, ToSql};
+use diesel::sql_types::*;
 use juniper::{Executor, FieldResult, ID};
 use juniper_from_schema::graphql_schema_from_file;
+use std::convert::TryFrom;
+use std::fmt;
+use std::io;
 
 use crate::types;
 
@@ -16,10 +24,23 @@ pub struct Game {
     image: String, // TODO: Change to Option<String>?
 }
 
-// TODO: Use From instead of Into
-impl Into<String> for ServerStatus {
-    fn into(self) -> String {
-        match self {
+impl TryFrom<String> for ServerStatus {
+    type Error = String;
+
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        match &s[..] {
+            "starting" => Ok(ServerStatus::Starting),
+            "started" => Ok(ServerStatus::Started),
+            "stopping" => Ok(ServerStatus::Stopping),
+            "stopped" => Ok(ServerStatus::Stopped),
+            _ => Err(format!("Invalid server status: {}", s)),
+        }
+    }
+}
+
+impl From<&ServerStatus> for String {
+    fn from(status: &ServerStatus) -> Self {
+        match status {
             ServerStatus::Stopped => String::from("stopped"),
             ServerStatus::Starting => String::from("starting"),
             ServerStatus::Started => String::from("started"),
@@ -28,14 +49,50 @@ impl Into<String> for ServerStatus {
     }
 }
 
-impl Into<ServerStatus> for String {
-    fn into(self) -> ServerStatus {
-        match &self[..] {
-            "starting" => ServerStatus::Starting,
-            "started" => ServerStatus::Started,
-            "stopping" => ServerStatus::Stopping,
-            _ => ServerStatus::Stopped,
-        }
+impl fmt::Display for ServerStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", String::from(self))
+    }
+}
+
+impl<DB: Backend> ToSql<Text, DB> for ServerStatus
+where
+    String: ToSql<Text, DB>,
+{
+    fn to_sql<W>(&self, out: &mut Output<W, DB>) -> serialize::Result
+    where
+        W: io::Write,
+    {
+        String::from(self).to_sql(out)
+    }
+}
+
+impl<DB: Backend> FromSql<Text, DB> for ServerStatus
+where
+    String: FromSql<Text, DB>,
+{
+    fn from_sql(bytes: Option<&DB::RawValue>) -> deserialize::Result<Self> {
+        Ok(ServerStatus::try_from(String::from_sql(bytes)?)?)
+    }
+}
+
+impl<DB: Backend> FromSqlRow<Text, DB> for ServerStatus
+where
+    String: FromSql<Text, DB>,
+{
+    fn build_from_row<T: row::Row<DB>>(row: &mut T) -> deserialize::Result<Self> {
+        Self::from_sql(row.take())
+    }
+}
+
+impl<DB: Backend> Queryable<Text, DB> for ServerStatus
+where
+    String: FromSql<Text, DB>,
+{
+    type Row = Self;
+
+    fn build(row: Self::Row) -> Self {
+        row
     }
 }
 
@@ -44,7 +101,7 @@ pub struct Server {
     id: types::Id,
     name: String,
     game_id: types::Id,
-    status: String,
+    status: ServerStatus,
 }
 
 pub struct ServerPayload {
@@ -82,8 +139,8 @@ impl ServerFields for Server {
         executor.context().get_game(&self.game_id)
     }
 
-    fn field_status(&self, _: &Executor<'_, Context>) -> FieldResult<ServerStatus> {
-        Ok(self.status.clone().into())
+    fn field_status(&self, _: &Executor<'_, Context>) -> FieldResult<&ServerStatus> {
+        Ok(&self.status)
     }
 }
 

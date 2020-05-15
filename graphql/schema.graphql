@@ -35,7 +35,7 @@ type Server {
   id: ID!
   name: String!
   game: Game! @juniper(ownership: "owned")
-  status: ServerStatus! @juniper(ownership: "owned")
+  status: ServerStatus!
 }
 
 type Mutation {
