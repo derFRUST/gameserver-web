@@ -8,7 +8,13 @@ use std::io;
 #[derive(Debug, Clone, PartialEq, Eq, AsExpression, FromSqlRow)]
 #[sql_type = "Integer"]
 pub struct Id {
-    pub id: juniper::ID,
+    id: juniper::ID,
+}
+
+impl AsRef<juniper::ID> for Id {
+    fn as_ref(&self) -> &juniper::ID {
+        &self.id
+    }
 }
 
 impl From<juniper::ID> for Id {

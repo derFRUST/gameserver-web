@@ -53,7 +53,7 @@ pub struct ServerPayload {
 
 impl GameFields for Game {
     fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&ID> {
-        Ok(&self.id.id)
+        Ok(self.id.as_ref())
     }
 
     fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
@@ -67,7 +67,7 @@ impl GameFields for Game {
 
 impl ServerFields for Server {
     fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&ID> {
-        Ok(&self.id.id)
+        Ok(self.id.as_ref())
     }
 
     fn field_name(&self, _: &Executor<'_, Context>) -> FieldResult<&String> {
