@@ -1,3 +1,6 @@
+#[macro_use]
+mod macros;
+
 mod game;
 mod graphql;
 mod id;
