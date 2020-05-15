@@ -15,10 +15,10 @@ impl TryFrom<String> for ServerStatus {
 
     fn try_from(s: String) -> Result<Self, Self::Error> {
         match &s[..] {
-            "starting" => Ok(ServerStatus::Starting),
-            "started" => Ok(ServerStatus::Started),
-            "stopping" => Ok(ServerStatus::Stopping),
-            "stopped" => Ok(ServerStatus::Stopped),
+            "STARTING" => Ok(ServerStatus::Starting),
+            "STARTED" => Ok(ServerStatus::Started),
+            "STOPPING" => Ok(ServerStatus::Stopping),
+            "STOPPED" => Ok(ServerStatus::Stopped),
             _ => Err(format!("Invalid server status: {}", s)),
         }
     }
@@ -27,10 +27,10 @@ impl TryFrom<String> for ServerStatus {
 impl From<&ServerStatus> for String {
     fn from(status: &ServerStatus) -> Self {
         match status {
-            ServerStatus::Stopped => String::from("stopped"),
-            ServerStatus::Starting => String::from("starting"),
-            ServerStatus::Started => String::from("started"),
-            ServerStatus::Stopping => String::from("stopping"),
+            ServerStatus::Stopped => String::from("STOPPED"),
+            ServerStatus::Starting => String::from("STARTING"),
+            ServerStatus::Started => String::from("STARTED"),
+            ServerStatus::Stopping => String::from("STOPPING"),
         }
     }
 }
