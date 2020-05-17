@@ -1,4 +1,65 @@
 #[macro_export]
+/// Automatically implement conversion functions to and from strings.
+macro_rules! implEnumString {
+    ( $t:ty; [ $( $e:path => $s:expr ),* ]) => {
+        // borrowing version
+        impl From<&$t> for String {
+            fn from(item: &$t) -> Self {
+                match item {
+                    $(
+                        $e => String::from($s),
+                    )*
+                }
+            }
+        }
+
+        // moving version
+        impl From<$t> for String {
+            fn from(item: $t) -> Self {
+                match item {
+                    $(
+                        $e => String::from($s),
+                    )*
+                }
+            }
+        }
+
+        // slice version
+        impl std::convert::TryFrom<&str> for $t {
+            type Error = String;
+
+            fn try_from(s: &str) -> Result<Self, Self::Error> {
+                match s {
+                    $(
+                        $s => Ok($e),
+                    )*
+                    _ => Err(format!("Invalid server status: {}", s)),
+                }
+            }
+        }
+
+        // borrowing version
+        impl std::convert::TryFrom<&String> for $t {
+            type Error = String;
+
+            fn try_from(s: &String) -> Result<Self, Self::Error> {
+                Self::try_from(&s[..])
+            }
+        }
+
+        // moving version
+        impl std::convert::TryFrom<String> for $t {
+            type Error = String;
+
+            fn try_from(s: String) -> Result<Self, Self::Error> {
+                Self::try_from(&s)
+
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! implEnumToSqlText {
     ( $t:ty ) => {
         impl std::fmt::Display for $t {
@@ -57,4 +118,49 @@ macro_rules! implEnumToSqlText {
             }
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    mod stringify_enum {
+        use std::convert::TryFrom;
+
+        #[derive(Debug, PartialEq, Eq)]
+        enum MyTestEnum {
+            ElementA,
+            ElementB,
+        }
+
+        implEnumString!(MyTestEnum; [MyTestEnum::ElementA => "A", MyTestEnum::ElementB => "B"]);
+
+        #[test]
+        fn test_to_string() {
+            // borrowed version
+            let element = MyTestEnum::ElementA;
+            let string = String::from(&element);
+            assert_eq!(string, "A");
+
+            // owned version
+            assert_eq!(String::from(MyTestEnum::ElementB), "B");
+        }
+        #[test]
+
+        fn test_from_string() -> Result<(), String> {
+            // borrowed version
+            let string = "A".to_owned();
+            let element = MyTestEnum::try_from(&string);
+            assert_eq!(element?, MyTestEnum::ElementA);
+
+            // owned version
+            assert_eq!(MyTestEnum::try_from("B".to_owned())?, MyTestEnum::ElementB);
+
+            // slice version
+            assert_eq!(MyTestEnum::try_from("B")?, MyTestEnum::ElementB);
+
+            // invalid value
+            assert!(MyTestEnum::try_from("C").is_err());
+
+            Ok(())
+        }
+    }
 }
