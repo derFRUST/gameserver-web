@@ -33,7 +33,7 @@ macro_rules! implEnumString {
                     $(
                         $s => Ok($e),
                     )*
-                    _ => Err(format!("Invalid server status: {}", s)),
+                    _ => Err(format!("Invalid value {} for type {}!", s, stringify!($t))),
                 }
             }
         }
@@ -143,8 +143,8 @@ mod tests {
             // owned version
             assert_eq!(String::from(MyTestEnum::ElementB), "B");
         }
-        #[test]
 
+        #[test]
         fn test_from_string() -> Result<(), String> {
             // borrowed version
             let string = "A".to_owned();
@@ -158,7 +158,12 @@ mod tests {
             assert_eq!(MyTestEnum::try_from("B")?, MyTestEnum::ElementB);
 
             // invalid value
-            assert!(MyTestEnum::try_from("C").is_err());
+            let result = MyTestEnum::try_from("C");
+            assert!(result.is_err());
+            assert_eq!(
+                String::from(result.unwrap_err()),
+                "Invalid value C for type MyTestEnum!"
+            );
 
             Ok(())
         }
