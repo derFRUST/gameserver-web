@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 use super::graphql::ServerStatus;
 
 implEnumString!(ServerStatus; [

@@ -62,6 +62,8 @@ macro_rules! implEnumString {
 #[macro_export]
 macro_rules! implEnumToSqlText {
     ( $t:ty ) => {
+        use std::convert::TryFrom;
+
         impl std::fmt::Display for $t {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{}", String::from(self))
