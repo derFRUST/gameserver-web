@@ -69,6 +69,30 @@ impl QueryFields for Query {
 pub struct Mutation;
 
 impl MutationFields for Mutation {
+    fn field_create_server(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, ServerPayload, Walked>,
+        input: CreateServerInput,
+    ) -> FieldResult<ServerPayload> {
+        use crate::schema::servers::dsl::*;
+        let connection = executor.context().pool.get().unwrap();
+        let result = diesel::insert_into(servers)
+            .values((
+                name.eq(input.name),
+                game_id.eq(Id::from(input.game_id)),
+                status.eq(ServerStatus::Stopped.to_string()),
+            ))
+            .execute(&connection)?;
+        println!("{:?}", result);
+
+        Ok(ServerPayload {
+            server: servers
+                .filter(id.eq(Id::from(juniper::ID::from("1".to_string()))))
+                .first(&connection)?,
+        })
+    }
+
     fn field_start_server(
         &self,
         executor: &Executor<'_, Context>,

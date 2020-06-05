@@ -39,22 +39,23 @@ type Server {
 }
 
 type Mutation {
-  updateServer(input: UpdateServerInput!): ServerPayload!
+  createServer(input: CreateServerInput!): ServerPayload!
     @juniper(ownership: "owned")
   startServer(input: StartServerInput!): ServerPayload!
     @juniper(ownership: "owned")
   stopServer(input: StopServerInput!): ServerPayload!
     @juniper(ownership: "owned")
-}
-
-input UpdateServerInput {
-  id: ID!
-  name: String!
-  gameId: ID!
+  updateServer(input: UpdateServerInput!): ServerPayload!
+    @juniper(ownership: "owned")
 }
 
 type ServerPayload {
   server: Server!
+}
+
+input CreateServerInput {
+  name: String!
+  gameId: ID!
 }
 
 input StartServerInput {
@@ -63,4 +64,10 @@ input StartServerInput {
 
 input StopServerInput {
   id: ID!
+}
+
+input UpdateServerInput {
+  id: ID!
+  name: String!
+  gameId: ID!
 }
