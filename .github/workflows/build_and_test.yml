@@ -1,0 +1,47 @@
+on: push
+
+name: Build and test
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          # - stable
+          # - beta
+          - nightly
+      fail-fast: false
+
+    steps:
+      - name: Install libsqlite3-dev
+        run: sudo apt-get install libsqlite3-dev
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Deploy toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: rustfmt, clippy
+
+      - name: Run build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --manifest-path rocket_testing/Cargo.toml
+
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path rocket_testing/Cargo.toml
+
+      - name: Check formatting
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --manifest-path rocket_testing/Cargo.toml --all -- --check
