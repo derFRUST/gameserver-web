@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use juniper::{Executor, FieldResult};
+use juniper::{graphql_value, Executor, FieldError, FieldResult};
 use juniper_from_schema::graphql_schema_from_file;
 
 use crate::db::ConnectionPool;
@@ -24,10 +24,53 @@ impl Context {
         Ok(games.filter(id.eq(input_id)).first(&connection)?)
     }
 
-    pub fn get_server(&self, input_id: Id) -> FieldResult<Server> {
+    pub fn get_server(&self, input_id: &Id) -> FieldResult<Server> {
         use crate::schema::servers::dsl::*;
         let connection = self.pool.get().unwrap();
         Ok(servers.filter(id.eq(input_id)).first(&connection)?)
+    }
+
+    pub fn start_server(&self, input_id: &Id) -> FieldResult<Server> {
+        let mut server = self.get_server(&input_id)?;
+
+        println!("Current Status: {}", server.status);
+        if server.status == ServerStatus::Stopped {
+            use crate::schema::servers::dsl::*;
+            let connection = self.pool.get().unwrap();
+            server.status = ServerStatus::Starting;
+            diesel::update(servers.find(&input_id))
+                .set(status.eq(server.status.to_string()))
+                .execute(&connection)?;
+
+            // TODO: actually start server
+        }
+        println!("New Status: {}", server.status);
+
+        match server.status {
+            ServerStatus::Stopping => Err(FieldError::new(
+                "Unexpected server status: Stopping",
+                graphql_value!({ "type": "STATUS_UNEXPECTED" }),
+            )),
+            _ => Ok(server),
+        }
+    }
+
+    pub fn stop_server(&self, input_id: &Id) -> FieldResult<Server> {
+        let mut server = self.get_server(&input_id)?;
+
+        println!("Current Status: {}", server.status);
+        if server.status == ServerStatus::Started || server.status == ServerStatus::Starting {
+            use crate::schema::servers::dsl::*;
+            let connection = self.pool.get().unwrap();
+            server.status = ServerStatus::Stopped; // TODO: set to Stopping when stopping is implemented
+            diesel::update(servers.find(&input_id))
+                .set(status.eq(server.status.to_string()))
+                .execute(&connection)?;
+
+            // TODO: actually stop server
+        }
+        println!("New Status: {}", server.status);
+        Ok(server)
     }
 
     pub fn update_server(&self, input: UpdateServerInput) -> FieldResult<Server> {
@@ -92,9 +135,11 @@ impl MutationFields for Mutation {
             .execute(&connection)?;
         println!("{:?}", result);
 
+        // TODO: alternative idea to using auto increment IDs:
+        // Use random GUID for identification instead.
         Ok(ServerPayload {
             server: servers
-                .filter(id.eq(Id::from(juniper::ID::from("1".to_string()))))
+                .filter(id.eq(Id::from(juniper::ID::from("1".to_string())))) // FIXME: find correct server
                 .first(&connection)?,
         })
     }
@@ -105,9 +150,9 @@ impl MutationFields for Mutation {
         _: &QueryTrail<'_, ServerPayload, Walked>,
         input: StartServerInput,
     ) -> FieldResult<ServerPayload> {
-        let server = executor.context().get_server(input.id.into())?;
-        println!("Current Status: {}", server.status);
-        Ok(ServerPayload { server })
+        Ok(ServerPayload {
+            server: executor.context().start_server(&input.id.into())?,
+        })
     }
 
     fn field_stop_server(
@@ -116,9 +161,9 @@ impl MutationFields for Mutation {
         _: &QueryTrail<'_, ServerPayload, Walked>,
         input: StopServerInput,
     ) -> FieldResult<ServerPayload> {
-        let server = executor.context().get_server(input.id.into())?;
-        println!("Current Status: {}", server.status);
-        Ok(ServerPayload { server })
+        Ok(ServerPayload {
+            server: executor.context().stop_server(&input.id.into())?,
+        })
     }
 
     fn field_update_server(
