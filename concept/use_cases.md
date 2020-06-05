@@ -4,18 +4,22 @@
 
 ## Users
 - list servers
+- create server
 - check server status
 - start server
-    - create new game
-    - continue last save game
-    - load available save game
 - stop server
-- create server
 - server configuration
     - basic settings
+    - select save game
+    - manage save games
+        - create new save game
+        - continue last save game
+        - upload and download save games
     - manage mod configuration
     - admin list
-- upload and download save games
+- manage running server
+    - view log output
+    - send command to server
 - delete server
 - manage account settings
 - log out
