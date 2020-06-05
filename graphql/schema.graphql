@@ -15,7 +15,7 @@ schema {
 
 type Query {
   games: [Game!]! @juniper(ownership: "owned")
-  servers: [Server!]! @juniper(ownership: "owned")
+  servers(id: ID): [Server!]! @juniper(ownership: "owned")
 }
 
 type Game {

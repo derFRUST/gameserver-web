@@ -59,10 +59,16 @@ impl QueryFields for Query {
         &self,
         executor: &Executor<'_, Context>,
         _: &QueryTrail<'_, Server, Walked>,
+        input_id: Option<juniper::ID>,
     ) -> FieldResult<Vec<Server>> {
         use crate::schema::servers::dsl::*;
         let connection = executor.context().pool.get().unwrap();
-        Ok(servers.load(&connection)?)
+        Ok(match input_id {
+            Some(input_id) => servers
+                .filter(id.eq(Id::from(input_id)))
+                .load(&connection)?,
+            None => servers.load(&connection)?,
+        })
     }
 }
 
