@@ -5,7 +5,9 @@ use rocket::{http::Method, response::content, State};
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
 use rocket_testing::db::establish_connection;
-use rocket_testing::model::{create_schema, Context, Schema};
+use rocket_testing::graphql_frontend::{create_schema, Context, Schema};
+
+use rocket_testing::gameserver::interactor::GameserverInteractor;
 
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
@@ -33,9 +35,12 @@ fn main() -> Result<(), Error> {
     }
     .to_cors()?;
 
+    let interactor = Box::leak(Box::new(GameserverInteractor::new(establish_connection())));
+
     rocket::ignite()
         .manage(Context {
-            pool: establish_connection(),
+            gameserver_control: interactor,
+            gameserver_view: interactor,
         })
         .manage(create_schema())
         .mount("/", rocket::routes![graphiql, post_graphql_handler])

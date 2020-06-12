@@ -19,7 +19,7 @@ type Query {
 }
 
 type Game {
-  id: ID!
+  id: ID! @juniper(ownership: "owned")
   name: String!
   image: String @juniper(ownership: "owned")
 }
@@ -32,10 +32,10 @@ enum ServerStatus {
 }
 
 type Server {
-  id: ID!
+  id: ID! @juniper(ownership: "owned")
   name: String!
   game: Game! @juniper(ownership: "owned")
-  status: ServerStatus!
+  status: ServerStatus! @juniper(ownership: "owned")
 }
 
 type Mutation {
