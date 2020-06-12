@@ -80,6 +80,19 @@ impl GameserverControl for GameserverInteractor {
         Id::new("1".to_string())
     }
 
+    fn delete_server(&self, input_id: &Id) {
+        let server = self.server_data(input_id);
+
+        use crate::schema::servers::dsl::*;
+        let connection = self.pool.get().unwrap();
+        diesel::delete(servers.find(&input_id))
+            .execute(&connection)
+            .unwrap(); // TODO: remove unwrap
+
+        // TODO: actually delete server
+        let _ = server;
+    }
+
     fn start_server(&self, input_id: &Id) {
         let server = self.server_data(input_id);
 

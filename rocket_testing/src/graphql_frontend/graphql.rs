@@ -2,7 +2,7 @@ use juniper::{Executor, FieldResult};
 use juniper_from_schema::graphql_schema_from_file;
 
 use super::game::Game;
-use super::payload::ServerPayload;
+use super::payload::{DeleteServerPayload, ServerPayload};
 
 use super::server::Server;
 
@@ -64,6 +64,18 @@ impl MutationFields for Mutation {
         Ok(ServerPayload {
             server: context.gameserver_view.server_data(&id),
         })
+    }
+
+    fn field_delete_server(
+        &self,
+        executor: &Executor<'_, Context>,
+        _: &QueryTrail<'_, DeleteServerPayload, Walked>,
+        input: DeleteServerInput,
+    ) -> FieldResult<DeleteServerPayload> {
+        let context = executor.context();
+        let id = input.id.clone().into();
+        context.gameserver_control.delete_server(&id); // TODO: add failure
+        Ok(DeleteServerPayload { id: input.id })
     }
 
     fn field_start_server(

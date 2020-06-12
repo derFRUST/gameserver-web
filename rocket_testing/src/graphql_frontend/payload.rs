@@ -1,7 +1,17 @@
-use juniper::{Executor, FieldResult};
+use juniper::{Executor, FieldResult, ID};
 
-use super::graphql::{Context, QueryTrail, ServerPayloadFields};
+use super::graphql::{Context, DeleteServerPayloadFields, QueryTrail, ServerPayloadFields};
 use super::server::Server;
+
+pub struct DeleteServerPayload {
+    pub id: ID,
+}
+
+impl DeleteServerPayloadFields for DeleteServerPayload {
+    fn field_id(&self, _: &Executor<'_, Context>) -> FieldResult<&ID> {
+        Ok(&self.id)
+    }
+}
 
 pub struct ServerPayload {
     pub server: Server,
