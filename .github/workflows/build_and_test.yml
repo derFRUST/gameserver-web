@@ -15,7 +15,9 @@ jobs:
 
     steps:
       - name: Install libsqlite3-dev
-        run: sudo apt-get install libsqlite3-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsqlite3-dev
 
       - name: Checkout
         uses: actions/checkout@v2
